@@ -2,6 +2,9 @@
 require('dotenv').config()
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+// const Employee = require("./lib/Employee");
+// const Department = require("./lib/Department");
+// const Role = require("./lib/Role");
 
 // create the connection information for the sql database
 var connection = mysql.createConnection({
@@ -59,10 +62,12 @@ function start() {
     });
 }
 
+//View Employee, Department, Roles
+
 function viewAllEmployees() {
   connection.query("SELECT * FROM employee", function (err, res) {
+      
     if (err) throw err;
-    
     console.table(res);
     start()
   });
@@ -79,10 +84,11 @@ function viewAllDepartments() {
 function viewAllRoles() {
   connection.query("SELECT * FROM role", function (err, res) {
     if (err) throw err;
-    console.log(res);
+    console.table(res);
     start()
   });
 }
+
 
 
 // function to handle posting new items up for auction
@@ -91,7 +97,7 @@ function addEmployee() {
     if (err) throw err;
     const managerList = res.map(employee => {
       return { name: `${employee.first_name} ${employee.last_name}`, value: employee.id }})
-      
+    
     inquirer
       .prompt([
         {
@@ -110,26 +116,32 @@ function addEmployee() {
           message: "Who is your employee's manager?",
           choices: managerList
         }
+        // {
+        //   name: "role",
+        //   type: "list",
+        //   message: "What is the employee's role?",
+        //   choices: roles
+        // }
       ])
       .then(function (answer) {
         // when finished prompting, insert a new item into the db with that info
         console.log(answer)
-        //   connection.query(
-        //     "INSERT INTO employee SET ?",
-        //     {
-        //       first_name: answer.firstname,
-        //       last_name: answer.lastname,
-        //     },
-        //     function(err) {
-        //       if (err) throw err;
-        //       console.log("The employee record was created successfully!");
-        //       // re-prompt the user for if they want to bid or post
-        //       start();
-        //     }
-        //   );
-        // });
+          connection.query(
+            "INSERT INTO employee SET ?",
+            {
+              first_name: answer.firstname,
+              last_name: answer.lastname,
+            },
+            function(err) {
+              if (err) throw err;
+              console.log("The employee record was created successfully!");
+              // re-prompt the user for if they want to bid or post
+              start();
+            }
+          );
+        });
       })
     // prompt for info about the item being put up for auction
-  })
+  
 }
 

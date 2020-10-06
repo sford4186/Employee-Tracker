@@ -8,12 +8,12 @@ CREATE TABLE employee(
   first_name VARCHAR(30) NOT NULL,
   last_name VARCHAR(30) NOT NULL,
   role_id INT NOT NULL,
-  manager_id INT,
+  manager_id INT NULL,
   PRIMARY KEY (id)
 );
 
 CREATE TABLE department(
-  id INT NOT NULL AUTO_INCREMENT,
+  id INT NOT NULL,
   name VARCHAR(30) NOT NULL,
   PRIMARY KEY(id)
 );
