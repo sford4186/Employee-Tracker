@@ -65,8 +65,8 @@ function start() {
 //View Employee, Department, Roles
 
 function viewAllEmployees() {
-  connection.query("SELECT * FROM employee", function (err, res) {
-      
+  var query="SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary from employee LEFT JOIN role ON employee.role_id=role.id INNER JOIN department ON department.id=role.department_id;";
+  connection.query(query, function (err, res) {
     if (err) throw err;
     console.table(res);
     start()
@@ -76,7 +76,7 @@ function viewAllEmployees() {
 function viewAllDepartments() {
   connection.query("SELECT * FROM department", function (err, res) {
     if (err) throw err;
-    console.log(res);
+    console.table(res);
     start()
   });
 }
@@ -90,8 +90,7 @@ function viewAllRoles() {
 }
 
 
-
-// function to handle posting new items up for auction
+//Adding new Employees, roles, departments
 function addEmployee() {
   connection.query("SELECT * FROM employee", function (err, res) {
     if (err) throw err;
@@ -115,12 +114,12 @@ function addEmployee() {
           type: "list",
           message: "Who is your employee's manager?",
           choices: managerList
-        }
+        },
         // {
         //   name: "role",
         //   type: "list",
         //   message: "What is the employee's role?",
-        //   choices: roles
+        //   choices: roleList
         // }
       ])
       .then(function (answer) {
@@ -131,17 +130,17 @@ function addEmployee() {
             {
               first_name: answer.firstname,
               last_name: answer.lastname,
+              id:answer.roles
+
             },
             function(err) {
               if (err) throw err;
               console.log("The employee record was created successfully!");
-              // re-prompt the user for if they want to bid or post
               start();
             }
           );
         });
       })
-    // prompt for info about the item being put up for auction
-  
+    
 }
 
