@@ -35,15 +35,29 @@ function start() {
       name: "userSelection",
       type: "list",
       message: "Would you like to do? (Use arrow keys)",
-      choices: ["View All Employees", "View All Departments", "View All Roles", "Add an Employee", "Add a Department", "Add a Role", "Update Employee Role"]
+      choices: ["View All Employees", 
+              "View All Employees by Department",
+              "View All Departments", 
+              "View All Roles", 
+              "Add an Employee", 
+              "Add a Department", 
+              "Add a Role", 
+              "Update Employee Role",
+              "Exit",
+            "getManagers"]
 
     })
     .then(function (answer) {
       // based on their answer, call functions
       if (answer.userSelection === "View All Employees") {
         viewAllEmployees();
-      }
-      else if (answer.userSelection === "View All Departments") {
+      } else if (answer.userSelection ==="View All Employees by Department"){
+        viewEmpByDepartment();
+      } else if (answer.userSelection ==="getManagers"){
+        getManagers();
+      }else if(answer.userSelection ==="View All Employees by Manager"){
+        viewEmpByManager();
+      } else if (answer.userSelection === "View All Departments") {
         viewAllDepartments();
       } else if (answer.userSelection === "View All Roles") {
         viewAllRoles();
@@ -56,42 +70,38 @@ function start() {
       } else if (answer.userSelection === "Update an Employee's Role") {
         updateRole();
       }
-      else {
+      else if(answer.userSelection==="Exit"){
         connection.end();
       }
     });
 }
 
-//View Employee, Department, Roles
-
-function viewAllEmployees() {
-  var query="SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary from employee LEFT JOIN role ON employee.role_id=role.id INNER JOIN department ON department.id=role.department_id;";
-  connection.query(query, function (err, res) {
+/*Employee Views and functions*/
+//**************************************************************************************** */
+function viewAllEmployees(managers) {
+  let query="SELECT e.id, e.first_name, e.last_name, department.name AS department, role.title, role.salary, m.first_name AS manager_first_name,  m.last_name AS manager_last_name from employee e LEFT JOIN employee m ON e.manager_id = m.id LEFT JOIN role ON e.role_id=role.id INNER JOIN department ON department.id=role.department_id";
+   connection.query(query, function (err, res) {
     if (err) throw err;
     console.table(res);
     start()
   });
 }
 
-function viewAllDepartments() {
-  connection.query("SELECT * FROM department", function (err, res) {
-    if (err) throw err;
-    console.table(res);
-    start()
-  });
-}
+// //Find all managers
+function getManagers(){
+    var query = "SELECT B.first_name AS manager_first, B.last_name AS manager_last from employee A, employee B where NOT A.manager_id<>B.id";
+      connection.query(query,  function(err, res) {
+        if (err) throw err;
+        console.table(res);
+        //start()
+        
+      });
+  
 
-function viewAllRoles() {
-  connection.query("SELECT * FROM role", function (err, res) {
-    if (err) throw err;
-    console.table(res);
-    start()
-  });
-}
+ }
 
-
-//Adding new Employees, roles, departments
-function addEmployee() {
+ //Add a New Employee
+ function addEmployee() {
   connection.query("SELECT * FROM employee", function (err, res) {
     if (err) throw err;
     const managerList = res.map(employee => {
@@ -109,6 +119,11 @@ function addEmployee() {
           type: "input",
           message: "What is the employee's last name?"
         },
+      //   {
+      //   name: "role",
+      //   type:"Input",
+      //   message: "What is the employee's role?"
+      // },
         {
           name: "manager",
           type: "list",
@@ -126,11 +141,11 @@ function addEmployee() {
         // when finished prompting, insert a new item into the db with that info
         console.log(answer)
           connection.query(
-            "INSERT INTO employee SET ?",
+            "ALTER TABLE employee DROP COLUMN manager VARCHAR;",
             {
               first_name: answer.firstname,
               last_name: answer.lastname,
-              id:answer.roles
+              manager:answer.manager
 
             },
             function(err) {
@@ -143,4 +158,31 @@ function addEmployee() {
       })
     
 }
+
+
+
+/*Department Views and Functions*/
+//**************************************************************************************** */
+
+function viewAllDepartments() {
+  connection.query("SELECT * FROM department", function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    start()
+  });
+}
+
+/*Role Views and Functions*/
+//******************************************************************************************* */
+
+function viewAllRoles() {
+  connection.query("SELECT * FROM role", function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    start()
+  });
+}
+
+
+
 
