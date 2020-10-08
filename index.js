@@ -37,6 +37,7 @@ function start() {
       message: "Would you like to do? (Use arrow keys)",
       choices: ["View All Employees", 
               "View All Employees by Department",
+              "View All Employees by Manager",
               "View All Departments", 
               "View All Roles", 
               "Add an Employee", 
@@ -53,7 +54,9 @@ function start() {
         viewAllEmployees();
       } else if (answer.userSelection ==="View All Employees by Department"){
         viewEmpByDepartment();
-      } else if (answer.userSelection ==="getManagers"){
+      } else if (answer.userSelection ==="View All Employees by Department"){
+        viewEmpByManager();
+      }else if (answer.userSelection ==="getManagers"){
         getManagers();
       }else if(answer.userSelection ==="View All Employees by Manager"){
         viewEmpByManager();
@@ -78,7 +81,7 @@ function start() {
 
 /*Employee Views and functions*/
 //**************************************************************************************** */
-function viewAllEmployees(managers) {
+function viewAllEmployees() {
   let query="SELECT e.id, e.first_name, e.last_name, department.name AS department, role.title, role.salary, m.first_name AS manager_first_name,  m.last_name AS manager_last_name from employee e LEFT JOIN employee m ON e.manager_id = m.id LEFT JOIN role ON e.role_id=role.id INNER JOIN department ON department.id=role.department_id";
    connection.query(query, function (err, res) {
     if (err) throw err;
@@ -86,6 +89,57 @@ function viewAllEmployees(managers) {
     start()
   });
 }
+
+function viewEmpByManager() {
+  inquirer
+    .prompt([
+      {
+      name: "managerFirst",
+      type: "input",
+      message: "What is the manager's first name?"
+    },
+    {
+      name: "managerLast",
+      type: "input",
+      message: "What is the manager's last name?"
+
+    }
+  ])
+    .then(function(answer) {
+      console.log(answer.managerFirst +" "& answer.managerLast);
+      let query="SELECT e.id, e.first_name, e.last_name, department.name AS department, role.title, role.salary, m.first_name AS manager_first_name,  m.last_name AS manager_last_name from employee e LEFT JOIN employee m ON e.manager_id = m.id LEFT JOIN role ON e.role_id=role.id INNER JOIN department ON department.id=role.department_id WHERE m.first_name=? AND m.last_name=?";
+      connection.query(query, [answer.managerFirst, answer.managerLast], function (err, res) {
+       if (err) throw err;
+       console.table(res);
+       start()
+     
+      });
+    });
+}
+
+function viewEmpByDepartment() {
+  inquirer
+    .prompt(
+      {
+      name: "department",
+      type: "input",
+      message: "What the department are you looking for?"
+    }
+  )
+    .then(function(answer) {
+      console.log(answer.department);
+      let query="SELECT e.id, e.first_name, e.last_name, department.name AS department, role.title, role.salary, m.first_name AS manager_first_name,  m.last_name AS manager_last_name from employee e LEFT JOIN employee m ON e.manager_id = m.id LEFT JOIN role ON e.role_id=role.id INNER JOIN department ON department.id=role.department_id WHERE department.name=?";
+      connection.query(query, answer.department, function (err, res) {
+       if (err) throw err;
+       console.table(res);
+       start()
+     
+      });
+    });
+}
+ 
+ 
+
 
 // //Find all managers
 function getManagers(){
