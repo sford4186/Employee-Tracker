@@ -25,6 +25,8 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
   if (err) throw err;
   console.log("WELCOME TO THE EMPLOYEE TRACKER")
+  console.log("***************************************************************************")
+  console.log("")
   // run the start function after the connection is made to prompt the user
   start();
 });
@@ -192,17 +194,11 @@ function addEmployee() {
             type: "list",
             message: "Who is your employee's manager?",
             choices: managerList
-          },
-          // {
-          //   name: "role",
-          //   type: "list",
-          //   message: "What is the employee's role?",
-          //   choices: roleList
-          // }
+          },          
         ])
         .then(function (answer) {
           // when finished prompting, insert a new item into the db with that info
-          console.log(answer)
+          //console.log(answer)
           connection.query(
             "INSERT INTO employee SET ?;",
             answer,
@@ -268,7 +264,7 @@ function addRole() {
         {
           name: "department_id",
           type: "list",
-          message: "Select a department",
+          message: "Select a department:",
           choices: departmentList
 
         }
@@ -277,7 +273,7 @@ function addRole() {
 
         connection.query(`INSERT INTO role SET ?`, answer, function (error, results) {
           if (error) throw error;
-          console.log("Insert into table1... successful");
+          console.log("Insert into role... successful");
           start()
         });
       });
@@ -296,10 +292,10 @@ function addDepartment() {
                 
       ])
       .then(function (answer) {
-        console.log(answer)
+        //console.log(answer)
         connection.query(`INSERT INTO department SET ?`, answer, function (error, results) {
           if (error) throw error;
-          console.log("Insert into table1... successful");
+          console.log("Insert into department... successful");
           start()
         });
       });
@@ -329,13 +325,7 @@ function updateEmployee() {
             type: "list",
             message: "What is the employee's role?",
             choices: roleList
-          },
-          // {
-          //   name: "role",
-          //   type: "list",
-          //   message: "What is the employee's role?",
-          //   choices: roleList
-          // }
+          },          
         ])
         .then(function (answer) {
           // when finished prompting, insert a new item into the db with that info
